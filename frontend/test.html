@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API</title>
+</head>
+<body>
+    <button id="startGameButton">Start Game</button>
+    <pre id="output"></pre>
+    <script>
+        document.getElementById("startGameButton").onclick = async function() {
+            try {
+                const response = await fetch('http://localhost:8080/api/start-game');
+                const data = await response.json();
+                document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById("output").textContent = error.message;
+            }
+        }
+    </script>
+</body>
+</html>
