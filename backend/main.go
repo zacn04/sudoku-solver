@@ -2,16 +2,17 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
+	"time"
 )
 
-// SudokuPuzzle represents the structure of the puzzle grid
 type SudokuPuzzle struct {
 	Grid [][]int `json:"grid"`
 }
 
-// solveSudoku solves the Sudoku puzzle using backtracking
 func solveSudoku(board [][]int) {
 	var solve func() bool
 	log.Println("solving rn")
@@ -38,16 +39,14 @@ func solveSudoku(board [][]int) {
 	solve()
 }
 
-// isValidSudoku checks if placing num at board[row][col] is valid
 func isValidSudoku(board [][]int, row, col, num int) bool {
-	// Check row and column
+
 	for i := 0; i < 9; i++ {
 		if board[row][i] == num || board[i][col] == num {
 			return false
 		}
 	}
 
-	// Check 3x3 box
 	startRow, startCol := 3*(row/3), 3*(col/3)
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 3; j++ {
@@ -60,21 +59,43 @@ func isValidSudoku(board [][]int, row, col, num int) bool {
 	return true
 }
 
-// startGameHandler handles the start game request
-func startGameHandler(w http.ResponseWriter, r *http.Request) {
+func generateSudokuPuzzle() SudokuPuzzle {
 	puzzle := SudokuPuzzle{
-		Grid: [][]int{
-			{5, 3, 0, 0, 7, 0, 0, 0, 0},
-			{6, 0, 0, 1, 9, 5, 0, 0, 0},
-			{0, 9, 8, 0, 0, 0, 0, 6, 0},
-			{8, 0, 0, 0, 6, 0, 0, 0, 3},
-			{4, 0, 0, 8, 0, 3, 0, 0, 1},
-			{7, 0, 0, 0, 2, 0, 0, 0, 6},
-			{0, 6, 0, 0, 0, 0, 2, 8, 0},
-			{0, 0, 0, 4, 1, 9, 0, 0, 5},
-			{0, 0, 0, 0, 8, 0, 0, 7, 9},
-		},
+		Grid: make([][]int, 9),
 	}
+	for i := range puzzle.Grid {
+		puzzle.Grid[i] = make([]int, 9)
+	}
+
+	numPlacements := chooseRandNum(7, 28, 35)
+
+	placeInitNumbers(&puzzle, numPlacements)
+	return puzzle
+}
+
+func chooseRandNum(numbers ...int) int {
+	rand.Seed(time.Now().UnixNano())
+	index := rand.Intn(len(numbers))
+	return numbers[index]
+}
+
+func placeInitNumbers(puzzle *SudokuPuzzle, numPlacements int) {
+	for count := 0; count < numPlacements; count++ {
+		row := rand.Intn(9)
+		col := rand.Intn(9)
+		value := rand.Intn(9) + 1
+		puzzle.Grid[row][col] = value
+		if (count+1)%7 == 0 {
+			if !isValidSudoku(puzzle.Grid, row, col, value) {
+				fmt.Println("Invalid puzzle state after", count+1, "placements")
+				break
+			}
+		}
+	}
+}
+
+func startGameHandler(w http.ResponseWriter, r *http.Request) {
+	puzzle := generateSudokuPuzzle()
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
@@ -84,27 +105,23 @@ func startGameHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func solvePuzzleHandler(w http.ResponseWriter, r *http.Request) {
-	// Set CORS headers
+
 	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
-	// Log incoming request
 	log.Printf("Incoming %s request to %s", r.Method, r.URL.Path)
 
-	// Handle OPTIONS request for CORS preflight
 	if r.Method == "OPTIONS" {
 		w.WriteHeader(http.StatusOK)
 		return
 	}
 
-	// Ensure POST request
 	if r.Method != "POST" {
 		http.Error(w, "Invalid request method", http.StatusBadRequest)
 		return
 	}
 
-	// Parse the request
 	var puzzle SudokuPuzzle
 	log.Println(puzzle)
 
@@ -116,14 +133,12 @@ func solvePuzzleHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Received puzzle: %+v", puzzle)
 
-	// Solve Sudoku
 	board := puzzle.Grid
 	solveSudoku(board)
 	puzzle.Grid = board
 
 	log.Printf("Solved puzzle: %+v", puzzle)
 
-	// Return solved puzzle as JSON response
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(puzzle); err != nil {
 		http.Error(w, "Failed to encode puzzle grid", http.StatusInternalServerError)
