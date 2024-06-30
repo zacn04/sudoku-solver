@@ -1,10 +1,9 @@
 import React from 'react';
 import './ControlPanel.css';
 
-const ControlPanel = ({ onStartGame, onSolvePuzzle, gameStarted }) => {
+const ControlPanel = ({ onStartGame, onSolvePuzzle, gameStarted, onClearGame, isPuzzleSolved }) => {
     return (
         <div className="control-panel">
-            <h1 className="title">Sudoku by Zac</h1>
             {!gameStarted && (
                 <div className="button-container">
                     <button className="start-game-button" onClick={onStartGame}>
@@ -16,6 +15,13 @@ const ControlPanel = ({ onStartGame, onSolvePuzzle, gameStarted }) => {
                 <div className="button-container">
                     <button className="solve-game-button" onClick={onSolvePuzzle}>
                         Solve Puzzle
+                    </button>
+                </div>
+            )}
+            {isPuzzleSolved && (
+                <div className="button-container">
+                    <button className="clear-game-button" onClick={onClearGame}>
+                Clear Game
                     </button>
                 </div>
             )}
