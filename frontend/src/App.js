@@ -25,29 +25,26 @@ function App() {
             });
     };
 
-    const handleSolvePuzzle = () => {
-        fetch('http://localhost:8080/api/solve-puzzle', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(puzzle), // Send the entire puzzle state
-        })
-        .then(response => {
+    const handleSolvePuzzle = async () => {
+        try {
+            const response = await fetch('http://localhost:8080/api/solve-puzzle', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ grid: puzzle }), // Correct structure
+            });
+
             if (!response.ok) {
                 throw new Error('Failed to solve puzzle');
             }
-            return response.json();
-        })
-        .then(data => {
-            setPuzzle(data); // Update puzzle state with solved puzzle data
-        })
-        .catch(error => {
+
+            const solvedPuzzle = await response.json();
+            setPuzzle(solvedPuzzle.grid); // Update puzzle state with solved puzzle grid
+        } catch (error) {
             console.error('Error solving puzzle:', error);
-        });
+        }
     };
-    
-    
 
     return (
         <div className="app">
@@ -56,10 +53,11 @@ function App() {
                 onSolvePuzzle={handleSolvePuzzle}
                 gameStarted={gameStarted}
             />
-            {gameStarted && puzzle && <SudokuGrid puzzle={puzzle} setPuzzle={setPuzzle} />}
+            {gameStarted && puzzle.length > 0 && (
+                <SudokuGrid puzzle={puzzle} setPuzzle={setPuzzle} />
+            )}
         </div>
     );
-    
 }
 
 export default App;

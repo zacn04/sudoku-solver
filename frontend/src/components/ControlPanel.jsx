@@ -23,4 +23,6 @@ const ControlPanel = ({ onStartGame, onSolvePuzzle, gameStarted }) => {
     );
 };
 
+
+
 export default ControlPanel;
