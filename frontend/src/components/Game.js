@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { startGame } from '../api'; // Ensure this import is correct
-import './Game.css'; // Assuming you have styling here
+import { startGame } from '../api'; 
+import './Game.css'; 
 
 function Game() {
   const [grid, setGrid] = useState([]);
@@ -8,8 +8,8 @@ function Game() {
 
   const handleStartGame = async () => {
     try {
-      const data = await startGame(); // Fetch the puzzle from the backend
-      setGrid(data.grid); // Update state with the fetched grid
+      const data = await startGame(); 
+      setGrid(data.grid); 
       setGameStarted(true);
     } catch (error) {
       console.error('Error starting game:', error);
@@ -30,8 +30,8 @@ function Game() {
                   key={cellIndex}
                   className="cell"
                   type="number"
-                  value={cell === 0 ? '' : cell} // Display empty if cell is 0
-                  readOnly // Prevent editing for now; remove if user input is allowed
+                  value={cell === 0 ? '' : cell} 
+                  readOnly 
                 />
               ))}
             </div>
