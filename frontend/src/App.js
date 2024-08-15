@@ -3,7 +3,7 @@ import SudokuGrid from './components/SudokuGrid';
 import ControlPanel from './components/ControlPanel';
 import './App.css';
 
-const API_BASE_URL = process.env.API_BASE_URL;
+const API_BASE_URL = process.env.API_BASE_URL || 'https://sudoku-solver-0e1b.onrender.com';
 
 function App() {
     const [puzzle, setPuzzle] = useState([]);
