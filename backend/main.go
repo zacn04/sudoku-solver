@@ -161,8 +161,8 @@ func corsMiddleware(next http.Handler) http.Handler {
 }
 
 func main() {
-	http.HandleFunc("/api/start-game", startGameHandler)
-	http.HandleFunc("/api/solve-puzzle", solvePuzzleHandler)
+	http.HandleFunc("/start-game", startGameHandler)
+	http.HandleFunc("/solve-puzzle", solvePuzzleHandler)
 	http.Handle("/api/", corsMiddleware(http.DefaultServeMux))
 
 	if err := http.ListenAndServe(":8080", nil); err != nil {
