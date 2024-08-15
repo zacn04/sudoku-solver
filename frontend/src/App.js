@@ -3,13 +3,15 @@ import SudokuGrid from './components/SudokuGrid';
 import ControlPanel from './components/ControlPanel';
 import './App.css';
 
+const API_BASE_URL = process.env.API_BASE_URL;
+
 function App() {
     const [puzzle, setPuzzle] = useState([]);
     const [gameStarted, setGameStarted] = useState(false);
     const [isPuzzleSolved, setisPuzzleSolved] = useState(false);
 
     const handleStartGame = () => {
-        fetch('http://localhost:8080/api/start-game')
+        fetch(`${API_BASE_URL}/start-game`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Failed to start game');
@@ -29,7 +31,7 @@ function App() {
 
     const handleSolvePuzzle = async () => {
         try {
-            const response = await fetch('http://localhost:8080/api/solve-puzzle', {
+            const response = await fetch(`${API_BASE_URL}/solve-puzzle`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
